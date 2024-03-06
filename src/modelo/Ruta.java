@@ -13,11 +13,7 @@ public class Ruta {
     private String ruta;
     private double valor;
 
-    public Ruta(long id, String ruta, double valor) {
-        this.id = id;
-        this.ruta = ruta;
-        this.valor = valor;
-    }
+   
 
     public long getId() {
         return id;

@@ -10,11 +10,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.sql.PreparedStatement;
+
 import modelo.Bus;
 import modelo.Chofer;
 import modelo.Cliente;
@@ -160,9 +161,52 @@ public class ControladorChofer {
         return null;
          
     }
+    
+   public Chofer buscarChofer(String cedula) {
+    Connection c;
+    try {
+        c = conexion.getConnection();
+        PreparedStatement ps = c.prepareStatement("SELECT * FROM choferes WHERE cedula = ?");
+        ps.setString(1, cedula);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            int id = rs.getInt("chofer_id");
+            String nombre = rs.getString("nombre");
+            String apellido = rs.getString("apellido");
+            String grupoSanguineo = rs.getString("grupoSanguineo");
+            String dni = rs.getString("cedula");
+            String telefono = rs.getString("telefono");
+            String domicilio = rs.getString("domicilio");
+            Date fechaNacimiento = rs.getDate("fechaNacimiento");
+            
+            // Crear un objeto Chofer con los datos obtenidos
+            Chofer chofer = new Chofer();
+            chofer.setNombre(nombre);
+            chofer.setId(id);
+            chofer.setCedula(cedula);
+            chofer.setGrupoSanguineo(grupoSanguineo);
+            chofer.setFechaNacimiento(fechaNacimiento);
+            chofer.setTelefono(telefono);
+            chofer.setCedula(dni);
+            chofer.setApellido(apellido);
+            chofer.setDomicilio(domicilio);
+            
+            // Cerrar el ResultSet y el PreparedStatement
+            rs.close();
+            ps.close();
+            
+            // Devolver el objeto Chofer
+            return chofer;
+        }
+        // Cerrar el ResultSet y el PreparedStatement si no se encuentra ningún chofer
+        rs.close();
+        ps.close();
+    } catch (Exception e) {
+        System.out.println("Error al buscar chofer: " + e.getMessage());
+    }
+    // Si no se encuentra ningún chofer, devolver null
+    return null;
+}
 
-    
-    
-    
      
 }

@@ -7,44 +7,60 @@ package controlador;
 import java.util.ArrayList;
 import java.util.List;
 import modelo.Bus;
+import modelo.Conexion;
 import modelo.Ruta;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author eduar
  */
 public class ControladorRuta {
+    Conexion conexion = Conexion.getInstance();
       
     private List<Ruta> listDestino;
     public ControladorRuta(){
         listDestino = new ArrayList();
     }
-    public long generarId(){
-        return listDestino.isEmpty()? 1: listDestino.get(listDestino.size()-1).getId()+1;
+    
+    public boolean crear(Ruta ruta){
+        Connection c;
+        
+        try {
+            c = conexion.getConnection();
+            PreparedStatement ps = c.prepareStatement("INSERT INTO rutas (ruta, valor) VALUES (?,?)");
+            ps.setString(1, ruta.getRuta());
+            ps.setDouble(2, ruta.getValor());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(ControladorRuta.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
-    public boolean crear(Ruta destino){
-        return listDestino.add(destino);
-    }
-    public Ruta buscar(long id){
-        return listDestino.stream().filter(a -> a.getId() == id).findFirst().get();
-    }
-    public boolean eliminar(Ruta destino){
-        return listDestino.remove(destino);
-    }
-    public boolean actualizar(Ruta destino){
-        return listDestino.set(listDestino.indexOf(buscar(destino.getId())), destino) != null;
-    }
-    public Ruta buscarByRuta(String ruta){
-        return listDestino.stream().filter(c-> c.getRuta().equals(ruta)).findFirst().get();
-    }
-    public Ruta buscarByValor(int valor){
-        return listDestino.stream().filter(c-> c.getValor() == (valor)).findFirst().get();
-    }
-    public List<Ruta> getListDestino() {
-        return listDestino;
-    }
-    public void setListDestino(List<Ruta> listDestino) {
-        this.listDestino = listDestino;
+    public ResultSet listarAll(){
+        Connection c;
+        try {
+            c = conexion.getConnection();
+            Statement s = c.createStatement();
+            ResultSet rs = s.executeQuery("SELECT * FROM rutas");
+            while (rs.next()) {                
+               rs.getInt("id_ruta");
+               rs.getString("ruta");
+               rs.getDouble("valor");
+               return rs;
+               
+            }
+        } catch (Exception e) {
+            
+        }
+        return null;
     }
    
 }

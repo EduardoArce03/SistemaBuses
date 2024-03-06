@@ -56,14 +56,7 @@ public class VistaPedido extends javax.swing.JInternalFrame {
         
         tblPedido.getSelectionModel().addListSelectionListener((e) -> {
         });
-        for(Ruta ruta : controladorRuta.getListDestino()){
-            mdlRuta.addElement(ruta.getRuta());
-        }
-        for(Cliente cliente : controladorCliente.getListCliente()){
-            mdlCliente.addElement(cliente.getNombre());
-        
-  
-        }cargarTabla();
+       cargarTabla();
         sumar();
         
     }
@@ -341,19 +334,7 @@ public class VistaPedido extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        if(pedido == null){
-            pedido = new Pedido(controladorPedido.generarId(), LocalDate.parse(txtFecha.getText()), LocalTime.parse(txtHora.getText()),controladorRuta.getListDestino().get(cmbRuta.getSelectedIndex()), controladorCliente.getListCliente().get(cmbCliente.getSelectedIndex()),Double.parseDouble(txtValor.getText()));
-            controladorPedido.crear(pedido);
-        }else{
-                       
-            pedido.setCliente(controladorCliente.getListCliente().get(cmbCliente.getSelectedIndex()));
-            pedido.setRuta(controladorRuta.getListDestino().get(cmbRuta.getSelectedIndex()));
-            pedido.setFecha(LocalDate.parse(txtFecha.getText()));
-            pedido.setHora(LocalTime.parse(txtHora.getText()));
-            pedido.setValor(Double.parseDouble(txtValor.getText()));
-        }cargarTabla();
-        sumar();
-        
+       
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed

@@ -8,6 +8,10 @@ import controlador.ControladorRuta;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import modelo.Ruta;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -34,17 +38,20 @@ public class VistaDestinos extends javax.swing.JInternalFrame {
     
     public void cargarTabla(){
         mdlRuta.setRowCount(0);
-        for(Ruta ruta : controladorRuta.getListDestino()){
-            Object fila[] = {ruta.getId(), ruta.getRuta(), ruta.getValor()};
-            mdlRuta.addRow(fila);
-            
+        ResultSet rs = controladorRuta.listarAll();
+        try {
+            while (rs.next()){
+                Object fila[] = {rs.getInt("id_ruta"), rs.getString("ruta"), rs.getString("valor")};
+                mdlRuta.addRow(fila);
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(VistaDestinos.class.getName()).log(Level.SEVERE, null, ex);
         }
-        listarForm(-1);
     }
     
     public void listarForm(int posicion){
         if(posicion >= 0){
-            ruta = controladorRuta.getListDestino().get(posicion);
             txtRuta.setText(ruta.getRuta());
             txtPrecio.setText(String.valueOf(ruta.getValor()));
         }else{
@@ -185,20 +192,21 @@ public class VistaDestinos extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        if (ruta == null) {
-            ruta = new Ruta(controladorRuta.generarId(), txtRuta.getText(), Double.parseDouble(txtPrecio.getText()));
-            controladorRuta.crear(ruta);
+        
+        Ruta ruta = new Ruta();
+        ruta.setRuta(txtRuta.getText());
+        ruta.setValor(Double.parseDouble(txtPrecio.getText()));
+        boolean resultado = controladorRuta.crear(ruta);
+        if (resultado) {
+            JOptionPane.showMessageDialog(null, "Creado exitosamente ");
         }else{
-            ruta.setRuta(txtRuta.getText());
-            ruta.setValor(Double.parseDouble(txtPrecio.getText()));
-            controladorRuta.actualizar(ruta);
-        }cargarTabla();
+            JOptionPane.showMessageDialog(null, "Existe un error a la hora de agregar una ruta ");
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         int resultado = JOptionPane.showConfirmDialog(this, "Seguro de eliminar");
         if(resultado == 0){
-            controladorRuta.eliminar(ruta);
             cargarTabla();
         }
     }//GEN-LAST:event_btnEliminarActionPerformed

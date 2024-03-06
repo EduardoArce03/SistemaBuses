@@ -49,12 +49,7 @@ public class VistaReserva extends javax.swing.JInternalFrame {
         for(Bus bus : controladorBus.getListBus()){
             mdlBus.addElement(bus.getPlaca());
         }
-        for(Ruta ruta : controladorRuta.getListDestino()){
-            mdlRuta.addElement(ruta.getRuta());
-        }
-        for(Cliente cliente : controladorCliente.getListCliente()){
-            mdlCliente.addElement(cliente.getNombre());
-        }cargarTabla();
+       cargarTabla();
         sumar();
     }
     
@@ -266,16 +261,7 @@ public class VistaReserva extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        if (reserva == null) {
-            reserva = new Reserva(controladorReserva.generarId(), controladorCliente.getListCliente().get(cmbCliente.getSelectedIndex()), controladorRuta.getListDestino().get(cmbRuta.getSelectedIndex()), controladorBus.getListBus().get(cmbBus.getSelectedIndex()) , Double.parseDouble(txtValor.getText()));
-            controladorReserva.crear(reserva);
-        }else{
-            reserva.setCliente(controladorCliente.getListCliente().get(cmbCliente.getSelectedIndex()));
-            reserva.setBus(controladorBus.getListBus().get(cmbBus.getSelectedIndex()));
-            reserva.setRuta(controladorRuta.getListDestino().get(cmbRuta.getSelectedIndex()));
-            reserva.setValor(Double.parseDouble(txtValor.getText()));
-        }cargarTabla();
-        sumar();
+       
         
     }//GEN-LAST:event_btnGuardarActionPerformed
 
