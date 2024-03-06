@@ -7,10 +7,19 @@ package vista;
 import controlador.ControladorCliente;
 import controlador.ControladorPedido;
 import controlador.ControladorRuta;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 import modelo.Cliente;
 import modelo.Pedido;
@@ -29,18 +38,20 @@ public class VistaPedido extends javax.swing.JInternalFrame {
     DefaultComboBoxModel mdlCliente;
     DefaultComboBoxModel mdlRuta;
     DefaultComboBoxModel mdlValor;
-
+    private JDialog panelAsientos;
+    boolean seleccionado = false;
     /**
      * Creates new form VistaPedido
      */
     public VistaPedido(ControladorPedido controladorPedido, ControladorCliente controladorCliente, ControladorRuta controladorRuta) {
-        initComponents();         
+        initComponents();
         this.controladorPedido = controladorPedido;
         this.controladorCliente = controladorCliente;
         this.controladorRuta = controladorRuta;
         this.mdlCliente = (DefaultComboBoxModel) cmbCliente.getModel();
         this.mdlRuta = (DefaultComboBoxModel) cmbRuta.getModel();
         this.mdlPedido = (DefaultTableModel) tblPedido.getModel();
+        
         
         
         tblPedido.getSelectionModel().addListSelectionListener((e) -> {
@@ -53,15 +64,44 @@ public class VistaPedido extends javax.swing.JInternalFrame {
         
   
         }cargarTabla();
-        validarAsientos();
         sumar();
         
     }
+
+  
     
+  private void inicializarAsientos() {
+    panelAsientos = new JDialog();
+    panelAsientos.setLayout(new GridLayout(15, 15, 5, 5));
+    
+    panelAsientos.setTitle("SELECCION DE ASIENTOS");
+    for (int fila = 0; fila < 4; fila++) {
+        for (int columna = 0; columna < 15; columna++) {
+            JButton botonAsiento = new JButton();
+            botonAsiento.setBackground(Color.green);
+            botonAsiento.setText((fila * 15 + columna + 1) + "");
+            botonAsiento.setText(botonAsiento.getText());
+            botonAsiento.addActionListener(e -> {
+                JOptionPane.showMessageDialog(null, "El asiento " + botonAsiento.getText() + " ha sido seleccionado");
+                seleccionado = true;
+                if (seleccionado == true) {
+                    botonAsiento.setBackground(Color.red);
+                    botonAsiento.setEnabled(false);
+                    botonAsiento.setBackground(Color.red);
+                }
+            });
+            panelAsientos.add(botonAsiento);
+        }
+    }
+    panelAsientos.setLocationRelativeTo(null); // Centramos la ventana en la pantalla
+    panelAsientos.setSize(1800, 1600);
+    panelAsientos.setVisible(true); // Mostramos el diálogo
+}
+
     public void cargarTabla(){
         mdlPedido.setNumRows(0);
         for(Pedido pedido : controladorPedido.getListPedido()){
-            Object [] fila = {pedido.getId(), pedido.getCliente(), pedido.getFecha(), pedido.getHora(), pedido.getRuta(), pedido.getAsiento(), pedido.getValor()};
+            Object [] fila = {pedido.getId(), pedido.getCliente(), pedido.getFecha(), pedido.getHora(), pedido.getRuta(), pedido.getValor()};
             mdlPedido.addRow(fila);
         }listarForm(-1);
     }
@@ -71,7 +111,6 @@ public class VistaPedido extends javax.swing.JInternalFrame {
             pedido = controladorPedido.getListPedido().get(posicion);
             txtFecha.setText(String.valueOf(pedido.getFecha()));
             txtHora.setText(String.valueOf(pedido.getHora()));
-            txtAsiento.setText(String.valueOf(pedido.getAsiento()));
             txtValor.setText(String.valueOf(pedido.getValor()));
             cmbCliente.setSelectedItem(pedido.getCliente().getNombre());
             cmbRuta.setSelectedItem(pedido.getRuta().getRuta());
@@ -79,7 +118,6 @@ public class VistaPedido extends javax.swing.JInternalFrame {
             pedido = null;
             txtFecha.setText("");
             txtHora.setText("");
-            txtAsiento.setText("");
             txtValor.setText("");
             cmbCliente.setSelectedIndex(0);
             cmbRuta.setSelectedIndex(0);
@@ -102,7 +140,7 @@ public class VistaPedido extends javax.swing.JInternalFrame {
 
     }
     
-    public void validarAsientos(){
+    /*public void validarAsientos(){
                 
         int tamFila = tblPedido.getRowCount();
         for (int i = 0; i < tamFila; i++) {
@@ -112,7 +150,7 @@ public class VistaPedido extends javax.swing.JInternalFrame {
                 
             }
         }
-    }
+    }*/
     
 
     /**
@@ -136,7 +174,6 @@ public class VistaPedido extends javax.swing.JInternalFrame {
         lblValor = new javax.swing.JLabel();
         txtFecha = new javax.swing.JTextField();
         txtHora = new javax.swing.JTextField();
-        txtAsiento = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblPedido = new javax.swing.JTable();
         btnNuevo = new javax.swing.JButton();
@@ -145,6 +182,7 @@ public class VistaPedido extends javax.swing.JInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         txtGanancia = new javax.swing.JTextField();
         txtValor = new javax.swing.JTextField();
+        AsientoBtn = new javax.swing.JButton();
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
@@ -162,12 +200,6 @@ public class VistaPedido extends javax.swing.JInternalFrame {
         lblRuta.setText("Ruta:");
 
         lblValor.setText("Valor:");
-
-        txtAsiento.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtAsientoActionPerformed(evt);
-            }
-        });
 
         tblPedido.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -205,6 +237,13 @@ public class VistaPedido extends javax.swing.JInternalFrame {
 
         jLabel2.setText("VALOR GANADO:");
 
+        AsientoBtn.setText("Seleccionar Asiento");
+        AsientoBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AsientoBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -240,7 +279,8 @@ public class VistaPedido extends javax.swing.JInternalFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblAsiento)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtAsiento, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(AsientoBtn)))
+                        .addGap(9, 9, 9)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(50, 50, 50)
@@ -270,10 +310,10 @@ public class VistaPedido extends javax.swing.JInternalFrame {
                     .addComponent(lblCliente)
                     .addComponent(lblAsiento)
                     .addComponent(cmbCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtAsiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnNuevo)
                     .addComponent(btnGuardar)
-                    .addComponent(btnEliminar))
+                    .addComponent(btnEliminar)
+                    .addComponent(AsientoBtn))
                 .addGap(22, 22, 22)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblFecha)
@@ -302,7 +342,7 @@ public class VistaPedido extends javax.swing.JInternalFrame {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         if(pedido == null){
-            pedido = new Pedido(controladorPedido.generarId(), LocalDate.parse(txtFecha.getText()), LocalTime.parse(txtHora.getText()),controladorRuta.getListDestino().get(cmbRuta.getSelectedIndex()), controladorCliente.getListCliente().get(cmbCliente.getSelectedIndex()),Double.parseDouble(txtValor.getText()) ,Integer.parseInt(txtAsiento.getText()));
+            pedido = new Pedido(controladorPedido.generarId(), LocalDate.parse(txtFecha.getText()), LocalTime.parse(txtHora.getText()),controladorRuta.getListDestino().get(cmbRuta.getSelectedIndex()), controladorCliente.getListCliente().get(cmbCliente.getSelectedIndex()),Double.parseDouble(txtValor.getText()));
             controladorPedido.crear(pedido);
         }else{
                        
@@ -310,10 +350,8 @@ public class VistaPedido extends javax.swing.JInternalFrame {
             pedido.setRuta(controladorRuta.getListDestino().get(cmbRuta.getSelectedIndex()));
             pedido.setFecha(LocalDate.parse(txtFecha.getText()));
             pedido.setHora(LocalTime.parse(txtHora.getText()));
-            pedido.setAsiento(Integer.parseInt(txtAsiento.getText()));
             pedido.setValor(Double.parseDouble(txtValor.getText()));
         }cargarTabla();
-        validarAsientos();
         sumar();
         
     }//GEN-LAST:event_btnGuardarActionPerformed
@@ -323,12 +361,19 @@ public class VistaPedido extends javax.swing.JInternalFrame {
         cargarTabla();
     }//GEN-LAST:event_btnEliminarActionPerformed
 
-    private void txtAsientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAsientoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtAsientoActionPerformed
+    private void AsientoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AsientoBtnActionPerformed
+        System.out.println("INICIANDO METODO ASIENTOS");
+    inicializarAsientos();
+    System.out.println("DESPUES ASIENTOS");
+    panelAsientos.setSize(new Dimension(500, 300)); // Configura el tamaño de la ventana emergente
+    panelAsientos.setLocationRelativeTo(null); // Centra la ventana emergente en la pantalla
+    panelAsientos.setVisible(true); // Muestra la ventana emergente
+        
+    }//GEN-LAST:event_AsientoBtnActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton AsientoBtn;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnNuevo;
@@ -345,7 +390,6 @@ public class VistaPedido extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblRuta;
     private javax.swing.JLabel lblValor;
     private javax.swing.JTable tblPedido;
-    private javax.swing.JTextField txtAsiento;
     private javax.swing.JTextField txtFecha;
     private javax.swing.JTextField txtGanancia;
     private javax.swing.JTextField txtHora;

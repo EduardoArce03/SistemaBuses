@@ -5,35 +5,29 @@
 package modelo;
 
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
  * @author eduar
  */
 public class Chofer {
-    private long id;
+    private int id;
     private String cedula;
     private String nombre;
+    private String apellido;
     private String domicilio;
     private String telefono;
-    private LocalDate fechaNacimiento;
-    private Bus bus;
-
-    public Chofer(long id, String cedula, String nombre, String domicilio, String telefono, LocalDate fechaNacimiento, Bus bus) {
-        this.id = id;
-        this.cedula = cedula;
-        this.nombre = nombre;
-        this.domicilio = domicilio;
-        this.telefono = telefono;
-        this.fechaNacimiento = fechaNacimiento;
-        this.bus = bus;
-    }
+    private Date fechaNacimiento;
+    private String grupoSanguineo;
+    private List<Bus> buses;
 
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -53,6 +47,14 @@ public class Chofer {
         this.nombre = nombre;
     }
 
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
     public String getDomicilio() {
         return domicilio;
     }
@@ -69,27 +71,36 @@ public class Chofer {
         this.telefono = telefono;
     }
 
-    public LocalDate getFechaNacimiento() {
+    public Date getFechaNacimiento() {
         return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+    public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    public Bus getBus() {
-        return bus;
+    public String getGrupoSanguineo() {
+        return grupoSanguineo;
     }
 
-    public void setBus(Bus bus) {
-        this.bus = bus;
+    public void setGrupoSanguineo(String grupoSanguineo) {
+        this.grupoSanguineo = grupoSanguineo;
+    }
+
+    public List<Bus> getBuses() {
+        return buses;
+    }
+
+    public void setBuses(List<Bus> buses) {
+        this.buses = buses;
     }
 
     @Override
     public String toString() {
-        return "Chofer{" + "id=" + id + ", cedula=" + cedula + ", nombre=" + nombre + ", domicilio=" + domicilio + ", telefono=" + telefono + ", fechaNacimiento=" + fechaNacimiento + ", bus=" + bus + '}';
+        return "Chofer{" + "id=" + id + ", cedula=" + cedula + ", nombre=" + nombre + ", apellido=" + apellido + ", domicilio=" + domicilio + ", telefono=" + telefono + ", fechaNacimiento=" + fechaNacimiento + ", grupoSanguineo=" + grupoSanguineo + ", buses=" + buses + '}';
     }
+
     
-    
+
     
 }

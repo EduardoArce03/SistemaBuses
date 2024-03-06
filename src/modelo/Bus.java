@@ -15,6 +15,7 @@ public class Bus {
     private int anio;
     private int capacidad;
     private String modelo;
+    private Chofer chofer;
 
     public Bus(long id, String placa, String marca, int anio, int capacidad, String modelo) {
         this.id = id;
@@ -73,13 +74,18 @@ public class Bus {
         this.modelo = modelo;
     }
 
+    public Chofer getChofer() {
+        return chofer;
+    }
+
+    public void setChofer(Chofer chofer) {
+        this.chofer = chofer;
+    }
+
     @Override
     public String toString() {
-        return "Bus{" + "id=" + id + ", placa=" + placa + ", marca=" + marca + ", anio=" + anio + ", capacidad=" + capacidad + ", modelo=" + modelo + '}';
+        return "Bus{" + "id=" + id + ", placa=" + placa + ", marca=" + marca + ", anio=" + anio + ", capacidad=" + capacidad + ", modelo=" + modelo + ", chofer=" + chofer + '}';
     }
-    
-    
-    
 
-
+   
 }

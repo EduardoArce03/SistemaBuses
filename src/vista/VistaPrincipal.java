@@ -165,6 +165,7 @@ public class VistaPrincipal extends javax.swing.JFrame {
         VistaPedido vistaPedidos = new VistaPedido(controladorPedido, controladorCliente, controladorRuta);
         dkpPrincipal.add(vistaPedidos);
         vistaPedidos.setVisible(true);
+        
     }//GEN-LAST:event_mniPedidosActionPerformed
 
     private void mniChoferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniChoferActionPerformed
@@ -221,7 +222,7 @@ public class VistaPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JDesktopPane dkpPrincipal;
+    public static javax.swing.JDesktopPane dkpPrincipal;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem2;

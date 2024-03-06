@@ -18,16 +18,17 @@ public class Pedido {
     private Ruta ruta;
     private Cliente cliente;
     private double valor;
-    private int asiento;
+    private boolean[][] asiento;
+    private Bus bus;
 
-    public Pedido(long id, LocalDate fecha, LocalTime hora, Ruta ruta, Cliente cliente, double valor, int asiento) {
+    public Pedido(long id, LocalDate fecha, LocalTime hora, Ruta ruta, Cliente cliente, double valor) {
         this.id = id;
         this.fecha = fecha;
         this.hora = hora;
         this.ruta = ruta;
         this.cliente = cliente;
         this.valor = valor;
-        this.asiento = asiento;
+        this.asiento = new boolean[4][15];
     }
 
     public long getId() {
@@ -78,14 +79,7 @@ public class Pedido {
         this.valor = valor;
     }
 
-    public int getAsiento() {
-        return asiento;
-    }
-
-    public void setAsiento(int asiento) {
-        this.asiento = asiento;
-    }
-
+  
     @Override
     public String toString() {
         return "Pedido{" + "id=" + id + ", fecha=" + fecha + ", hora=" + hora + ", ruta=" + ruta + ", cliente=" + cliente + ", valor=" + valor + ", asiento=" + asiento + '}';

@@ -1,21 +1,23 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
- */
+
 package vista;
 
 import controlador.ControladorBus;
 import controlador.ControladorChofer;
 import java.time.LocalDate;
+import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 import modelo.Bus;
 import modelo.Chofer;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
-/**
- *
- * @author eduar
- */
+
 public class VistaChofer extends javax.swing.JInternalFrame {
     ControladorChofer controladorChofer;
     ControladorBus controladorBus;
@@ -31,32 +33,36 @@ public class VistaChofer extends javax.swing.JInternalFrame {
         this.controladorBus = controladorBus;
         this.controladorChofer = controladorChofer;
         this.mdlChofer = (DefaultTableModel) tblChofer.getModel();
-        this.mdlBus = (DefaultComboBoxModel) cmbBus.getModel();
+        
         tblChofer.getSelectionModel().addListSelectionListener((e) -> {
-        });
-        for(Bus bus : controladorBus.getListBus()){
-            mdlBus.addElement(bus.getPlaca());
+            rellenarCampos();
+        });   
             
-        }cargarTabla();
+        cargarTabla();
+        
     }
     
     public void cargarTabla(){
         mdlChofer.setNumRows(0);
-        for (Chofer chofer : controladorChofer.getListChofer()){
-            Object fila[] = {controladorChofer.generarId(), chofer.getCedula(), chofer.getDomicilio(), chofer.getFechaNacimiento(), chofer.getBus(), chofer.getNombre(), chofer.getTelefono()};
-            mdlChofer.addRow(fila);
-        }listarForm(-1);
+        ResultSet resultado = controladorChofer.getListChofer();
+        try {
+            while (resultado.next()) {
+                 Object fila[] = {resultado.getInt("chofer_id"), resultado.getString("cedula"), resultado.getString("domicilio"), resultado.getString("fechaNacimiento"), resultado.getString("nombre"), resultado.getString("apellido")};
+                 mdlChofer.addRow(fila);
+            }listarForm(-1);
+        } catch (SQLException ex) {
+            Logger.getLogger(VistaChofer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
     }
     
     public void listarForm(int posicion){
         if(posicion >= 0){
-            chofer = controladorChofer.getListChofer().get(posicion);
             txtCedula.setText(chofer.getCedula());
             txtDomicilio.setText(chofer.getDomicilio());
             txtFechaNacimiento.setText(String.valueOf(chofer.getFechaNacimiento()));
             txtNombre.setText(chofer.getNombre());
             txtTelefono.setText(chofer.getTelefono());
-            cmbBus.setSelectedItem(chofer.getBus().getPlaca());
         }else{
             chofer = null;
             txtCedula.setText("");
@@ -64,9 +70,38 @@ public class VistaChofer extends javax.swing.JInternalFrame {
             txtFechaNacimiento.setText("");
             txtNombre.setText("");
             txtTelefono.setText("");
-            cmbBus.setSelectedItem(0);
+            txtApellido.setText("");
+            txtGrupo.setText("");
         }
     }
+    
+    public void rellenarCampos() {
+    int seleccionado = tblChofer.getSelectedRow();
+    System.out.println(seleccionado);
+    if (seleccionado != -1) {
+        int idChofer = (int) tblChofer.getValueAt(seleccionado, 0);
+        System.out.println(idChofer);
+        ResultSet rs = controladorChofer.llenarCampos(idChofer);
+        System.out.println("HOLAA");   
+        try {
+            System.out.println("MMMM");
+            System.out.println(rs.getString("nombre"));
+            txtNombre.setText(rs.getString("nombre"));
+            txtApellido.setText(rs.getString("apellido"));
+            txtGrupo.setText(rs.getString("grupoSanguineo")); 
+            txtCedula.setText(rs.getString("cedula")); 
+            txtTelefono.setText(rs.getString("telefono")); 
+            txtDomicilio.setText(rs.getString("domicilio")); 
+            txtFechaNacimiento.setText(rs.getString("fechaNacimiento")); 
+       
+        } catch (SQLException ex) {
+            Logger.getLogger(VistaChofer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+               
+    }
+}
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -89,12 +124,15 @@ public class VistaChofer extends javax.swing.JInternalFrame {
         txtDomicilio = new javax.swing.JTextField();
         txtTelefono = new javax.swing.JTextField();
         txtFechaNacimiento = new javax.swing.JTextField();
-        cmbBus = new javax.swing.JComboBox<>();
         btnNuevo = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblChofer = new javax.swing.JTable();
+        jLabel2 = new javax.swing.JLabel();
+        txtGrupo = new javax.swing.JTextField();
+        txtApellido = new javax.swing.JTextField();
+        btnActualizar = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Lucida Bright", 0, 48)); // NOI18N
         jLabel1.setText("Registro de Chofer");
@@ -103,7 +141,7 @@ public class VistaChofer extends javax.swing.JInternalFrame {
 
         lblNombre.setText("Nombre:");
 
-        lblBus.setText("Bus:");
+        lblBus.setText("Apellido:");
 
         lblDomicilio.setText("Domicilio:");
 
@@ -140,10 +178,19 @@ public class VistaChofer extends javax.swing.JInternalFrame {
                 {null, null, null, null, null, null}
             },
             new String [] {
-                "Id", "Cedula", "Domicilio", "Fecha de Nacimiento", "Bus", "Nombre"
+                "Id", "Cedula", "Domicilio", "Fecha de Nacimiento", "Nombre", "Apellido"
             }
         ));
         jScrollPane1.setViewportView(tblChofer);
+
+        jLabel2.setText("Grupo Sanguineo");
+
+        btnActualizar.setText("Actualizar");
+        btnActualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnActualizarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -152,23 +199,26 @@ public class VistaChofer extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addComponent(lblNombre)
+                            .addGap(18, 18, 18)
+                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(51, 51, 51)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(lblBus)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(txtApellido))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(lblCedula)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(txtCedula, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addComponent(jLabel1))
+                .addGap(32, 32, 32)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(68, 68, 68)
-                                .addComponent(lblBus)
-                                .addGap(18, 18, 18)
-                                .addComponent(cmbBus, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(51, 51, 51)
-                                .addComponent(lblCedula)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtCedula, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(lblNombre)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(174, 174, 174)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblDomicilio)
                             .addComponent(lblTelefono)
@@ -178,14 +228,17 @@ public class VistaChofer extends javax.swing.JInternalFrame {
                             .addComponent(txtDomicilio, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
                             .addComponent(txtTelefono)
                             .addComponent(txtFechaNacimiento)))
-                    .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtGrupo)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(btnGuardar)
-                        .addComponent(btnNuevo))
-                    .addComponent(btnEliminar))
-                .addGap(45, 45, 45))
+                    .addComponent(btnGuardar)
+                    .addComponent(btnNuevo)
+                    .addComponent(btnEliminar)
+                    .addComponent(btnActualizar))
+                .addGap(43, 43, 43))
             .addGroup(layout.createSequentialGroup()
                 .addGap(34, 34, 34)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 830, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -199,44 +252,51 @@ public class VistaChofer extends javax.swing.JInternalFrame {
                         .addGap(24, 24, 24)
                         .addComponent(jLabel1)
                         .addGap(10, 10, 10)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(lblNombre))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblNombre)
+                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(txtGrupo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnNuevo))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(lblTelefono))
-                            .addComponent(btnNuevo, javax.swing.GroupLayout.Alignment.TRAILING))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(22, 22, 22)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblTelefono)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnGuardar)))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblDomicilio)
-                            .addComponent(txtDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtFechaNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblFechaNacimiento)))
+                            .addComponent(txtDomicilio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnEliminar))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtFechaNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblFechaNacimiento)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnActualizar)
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtCedula, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblCedula))
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cmbBus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblBus))
-                        .addGap(0, 1, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(btnGuardar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnEliminar)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                            .addComponent(lblBus)
+                            .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 6, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -249,31 +309,84 @@ public class VistaChofer extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        if(chofer == null){
-            chofer = new Chofer(controladorChofer.generarId(), txtCedula.getText(), txtNombre.getText(), txtDomicilio.getText(), txtTelefono.getText(), LocalDate.parse(txtFechaNacimiento.getText()), controladorBus.getListBus().get(cmbBus.getSelectedIndex()));
-            controladorChofer.crear(chofer);
-        }else{
+
+            chofer = new Chofer();
             chofer.setCedula(txtCedula.getText());
             chofer.setNombre(txtNombre.getText());
             chofer.setDomicilio(txtDomicilio.getText());
             chofer.setTelefono(txtTelefono.getText());
-            chofer.setFechaNacimiento(LocalDate.parse(txtFechaNacimiento.getText()));
-            chofer.setBus(controladorBus.getListBus().get(cmbBus.getSelectedIndex()));
-        }cargarTabla();
+            chofer.setApellido(txtApellido.getText());
+            chofer.setGrupoSanguineo(txtGrupo.getText());
+            String fechaNacimientoTexto = txtFechaNacimiento.getText();
+            SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd");
+            Date fechaNacimiento;
+        try {
+            fechaNacimiento = formatoFecha.parse(fechaNacimientoTexto);
+            chofer.setFechaNacimiento(fechaNacimiento);
+        } catch (ParseException ex) {
+            Logger.getLogger(VistaChofer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+            boolean resultado = controladorChofer.crear(chofer);
+            if (resultado) {
+                JOptionPane.showMessageDialog(null, "El chofer ha sido agregado ");
+                cargarTabla();
+        }else{
+                JOptionPane.showMessageDialog(null, "Ha existido un error al agregar al chofer ");
+            }
+            
+            
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        controladorChofer.eliminar(chofer);
+        int seleccionado = tblChofer.getSelectedRow();
+        System.out.println(seleccionado);
+        if (seleccionado != -1) {
+            int idChofer = (int) tblChofer.getValueAt(seleccionado, 0);
+            System.out.println(idChofer);
+            boolean resultado = controladorChofer.eliminar(idChofer);
+            if (resultado) {
+                JOptionPane.showMessageDialog(null, "Eliminado correctamente ");
+            }else{
+                JOptionPane.showMessageDialog(null, "Ha ocurrido un erorr al eliminar ");
+            }
+        }
         cargarTabla();
     }//GEN-LAST:event_btnEliminarActionPerformed
 
+    private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
+        String nombre = txtNombre.getText();
+        String apellido = txtApellido.getText();
+        String grupo = txtGrupo.getText();
+        String cedula = txtCedula.getText();
+        String direccion = txtDomicilio.getText();
+        String telefono = txtTelefono.getText();
+        String fechaNacimiento = txtFechaNacimiento.getText();
+        String fechaNacimientoTexto = txtFechaNacimiento.getText();
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd");
+        Date fechaNacimientoxd;
+        try {
+            int seleccionado = tblChofer.getSelectedRow();
+            fechaNacimientoxd = formatoFecha.parse(fechaNacimientoTexto);
+            if (seleccionado != -1) {
+            int idChofer = (int) tblChofer.getValueAt(seleccionado, 0);
+            controladorChofer.actualizar(idChofer, nombre, apellido, grupo, cedula, telefono, direccion, fechaNacimientoxd);
+        }
+        } catch (ParseException ex) {
+            Logger.getLogger(VistaChofer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }//GEN-LAST:event_btnActualizarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnNuevo;
-    private javax.swing.JComboBox<String> cmbBus;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblBus;
     private javax.swing.JLabel lblCedula;
@@ -282,9 +395,11 @@ public class VistaChofer extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblNombre;
     private javax.swing.JLabel lblTelefono;
     private javax.swing.JTable tblChofer;
+    private javax.swing.JTextField txtApellido;
     private javax.swing.JTextField txtCedula;
     private javax.swing.JTextField txtDomicilio;
     private javax.swing.JTextField txtFechaNacimiento;
+    private javax.swing.JTextField txtGrupo;
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtTelefono;
     // End of variables declaration//GEN-END:variables
